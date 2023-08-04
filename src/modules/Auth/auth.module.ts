@@ -1,0 +1,28 @@
+import { Module } from '@nestjs/common';
+import {
+  AuthService,
+  CryptService,
+  UserJwtService,
+  UserService,
+} from './services';
+import { AuthController, UserController } from './controllers';
+import { GoogleStrategy, LocalStrategy } from './strategy';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { UserRepository } from './repositories';
+
+@Module({
+  imports: [PassportModule, JwtModule],
+  controllers: [AuthController, UserController],
+  providers: [
+    AuthService,
+    CryptService,
+    LocalStrategy,
+    GoogleStrategy,
+    UserJwtService,
+    UserRepository,
+    UserService,
+  ],
+  exports: [UserJwtService],
+})
+export class AuthModule {}

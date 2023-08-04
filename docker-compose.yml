@@ -1,0 +1,67 @@
+version: "3.7"
+
+services:
+  proxy:
+    image: nginx:alpine
+    restart: always
+    container_name: proxy
+    ports:
+      - "8000:90"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    command: [ nginx-debug, '-g', 'daemon off;' ]
+  nest:
+    build:
+      context: .
+      dockerfile: DockerFile.dev
+    container_name: nest
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - package:/usr/src/app/node_modules
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: "sqale"
+      MYSQL_USER: "sqale"
+      MYSQL_PASSWORD: "sqale"
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3500:3306"
+    volumes:
+      - db:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "4322:80"
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+
+  cache:
+    image: redis:7.0-alpine
+    restart: always
+    container_name: cache
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - cache:/data
+
+volumes:
+  db:
+    driver: local
+  cache:
+    driver: local
+  package:
+    driver: local
