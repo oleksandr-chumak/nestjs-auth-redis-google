@@ -22,10 +22,11 @@ export class OnlyAuthorizedGuard implements CanActivate {
       throw new TokenNotFoundException();
     }
     const payload = await this.jwtService.verifyAccessToken(accessToken);
+    console.log(payload);
     if (!payload) {
       throw new InvalidTokenException();
     }
-    const { password: _, ...user } = await this.userService.findOneBy({
+    const user = await this.userService.findOneBy({
       id: payload.id,
     });
     if (!user) {

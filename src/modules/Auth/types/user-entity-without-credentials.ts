@@ -1,3 +1,3 @@
-import { UserEntity } from '../entities/user.entity';
+import { UserEntity } from '../entities';
 
-export type UserEntityWithoutCredentials = Omit<UserEntity, 'password'>;
+export type UserEntityWithoutCredentials = Omit<UserEntity, 'credentials'>;

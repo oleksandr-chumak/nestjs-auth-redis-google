@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../repositories/user.repository';
-import { UserEntity } from '../entities/user.entity';
-import { DeepPartial, FindOptionsWhere } from 'typeorm';
+import { UserRepository } from '../repositories';
+import { UserEntity } from '../entities';
+import {
+  DeepPartial,
+  FindOneOptions,
+  FindOptionsWhere,
+  SaveOptions,
+} from 'typeorm';
+import { FindOptionsRelations } from 'typeorm/find-options/FindOptionsRelations';
 
 @Injectable()
 export class UserService {
@@ -11,7 +17,22 @@ export class UserService {
     return this.userRepository.findOneBy(where);
   }
 
-  save(entities: DeepPartial<UserEntity>) {
-    return this.userRepository.save(entities);
+  findOne(options: FindOneOptions<UserEntity>): Promise<UserEntity> {
+    return this.userRepository.findOne(options);
+  }
+
+  findUserByEmail(email: string, relations?: FindOptionsRelations<UserEntity>) {
+    return this.userRepository.findOne({
+      where: { email },
+      relations,
+    });
+  }
+
+  save(entities: DeepPartial<UserEntity>, options?: SaveOptions) {
+    return this.userRepository.save(entities, options);
+  }
+
+  createQueryBuilder(alias: string) {
+    return this.userRepository.createQueryBuilder(alias);
   }
 }

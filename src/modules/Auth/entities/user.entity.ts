@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
-import { BaseEntity } from '../../../common/base/base.entity';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { BaseEntity } from '@common/base';
+import { UserCredentialsEntity } from './user-credentials.entity';
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -7,6 +8,11 @@ export class UserEntity extends BaseEntity {
   username: string;
   @Column({ unique: true })
   email: string;
-  @Column()
-  password: string;
+  @OneToOne(() => UserCredentialsEntity, (credentials) => credentials.user, {
+    cascade: true,
+  })
+  @JoinColumn()
+  credentials: UserCredentialsEntity;
+  @Column({ nullable: true })
+  photo: string;
 }

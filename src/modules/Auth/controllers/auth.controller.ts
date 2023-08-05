@@ -3,6 +3,8 @@ import { GoogleAuthGuard, LocalAuthGuard } from '../guards';
 import { LoginUserDto, RegisterUserDto, UserAuthRefreshTokenDto } from '../dto';
 import { AuthService, UserJwtService } from '../services';
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { GoogleUser } from '../interfaces';
+import { ProviderName } from '../enum';
 
 @Controller('auth')
 export class AuthController {
@@ -28,17 +30,28 @@ export class AuthController {
 
   @UseGuards(GoogleAuthGuard)
   @Get('/login/google/callback')
-  googleCallback(@CurrentUser() user) {
-    return user;
+  async googleCallback(@Req() req, @CurrentUser() user: GoogleUser) {
+    const userId = await this.authService.externalUser(
+      user,
+      ProviderName.GOOGLE,
+    );
+    const tokens = await this.jwtService.generateTokens({ id: userId });
+    req.session.authorization = tokens.accessToken;
+    return {
+      refreshToken: tokens.refreshToken,
+    };
   }
 
   @Post('register')
-  register(@Body() user: RegisterUserDto) {
+  register(@Body() user: RegisterUserDto): Promise<any> {
     return this.authService.registerUser(user);
   }
 
   @Post('/refresh')
-  async refreshAccess(@Req() req, @Body() data: UserAuthRefreshTokenDto) {
+  async refreshAccess(
+    @Req() req,
+    @Body() data: UserAuthRefreshTokenDto,
+  ): Promise<void> {
     req.session.authorization =
       await this.jwtService.generateAccessTokenByRefreshToken(
         data.refreshToken,
