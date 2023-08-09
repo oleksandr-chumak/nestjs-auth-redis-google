@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DATABASE_CONFIG } from './common/config/database.config';
-import { AuthModule } from './modules/Auth/auth.module';
+import { AuthModule } from './modules/auth';
+import { MailModule } from './modules/mail';
+import { DATABASE_CONFIG } from '@common/config';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(DATABASE_CONFIG), AuthModule],
+  imports: [TypeOrmModule.forRoot(DATABASE_CONFIG), AuthModule, MailModule],
 })
 export class AppModule {}

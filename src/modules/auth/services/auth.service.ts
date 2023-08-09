@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CryptService } from './crypt.service';
-import { UserEntityWithoutCredentials } from '../types';
+import { ExternalUser, UserEntityWithoutCredentials } from '../types';
 import { RegisterUserDto } from '../dto';
 import {
   PasswordNotMatchException,
   UserAlreadyExistException,
 } from '../exceptions';
-import { ExternalUser } from '../types';
 import { ProviderName } from '../enum';
 import { UserEntity } from '../entities';
 import { UserAuthProviderService } from './user-auth-provider.service';
@@ -56,7 +55,7 @@ export class AuthService {
     const user = await this.userService.findUserByEmail(email, {
       credentials: true,
     });
-    const hashedPassword = user.credentials.password;
+    const hashedPassword = user?.credentials.password;
     if (user && (await this.cryptService.compare(password, hashedPassword))) {
       const { credentials: _, ...result } = user;
       return result;
@@ -104,6 +103,7 @@ export class AuthService {
       },
     });
   }
+
   private createUserWithProvider(
     user: ExternalUser,
     provider: Provider,

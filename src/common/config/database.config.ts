@@ -3,7 +3,7 @@ import {
   UserAuthProviderEntity,
   UserCredentialsEntity,
   UserEntity,
-} from '../../modules/Auth/entities';
+} from '../../modules/auth/entities';
 import * as process from 'process';
 
 export const DATABASE_CONFIG: TypeOrmModuleOptions = {
